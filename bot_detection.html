@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UIDAI Bot Detection</title>
+    <script>
+        // Collecting environmental parameters
+        function collectEnvironmentData() {
+            const data = {
+                userAgent: navigator.userAgent, // Browser info
+                screenWidth: window.innerWidth,
+                screenHeight: window.innerHeight,
+                timezoneOffset: new Date().getTimezoneOffset(),
+                language: navigator.language,
+                platform: navigator.platform,
+                cookiesEnabled: navigator.cookieEnabled,
+                localStorageEnabled: typeof(Storage) !== "undefined",
+                sessionStorageEnabled: typeof(sessionStorage) !== "undefined",
+                mouseMovements: [],
+                keyPresses: [],
+                interactionTime: Date.now(),
+            };
+
+            // Track mouse movement
+            document.addEventListener('mousemove', (e) => {
+                const movement = { x: e.pageX, y: e.pageY, timestamp: Date.now() };
+                data.mouseMovements.push(movement);
+                console.log("Mouse Movement Recorded:", movement);
+            });
+
+            // Track keyboard presses
+            document.addEventListener('keydown', (e) => {
+                const keyPress = { key: e.key, timestamp: Date.now() };
+                data.keyPresses.push(keyPress);
+                console.log("Key Press Recorded:", keyPress); 
+            });
+
+            // Send the data to the backend every 10 seconds
+           setInterval(() => {
+                console.log("Collected Data Before Sending:", data); // Print all collected data
+                sendToBackend(data);
+            }, 10000);
+        }
+
+        // Send collected data to the backend for analysis
+        function sendToBackend(data) {
+            console.log("Sending data to backend...");
+            fetch('http://localhost:5000/analyze', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Backend Response:", data);
+                if (data.isBot) {
+                    alert('Please perform an additional interaction to verify you are a human.');
+                    
+                }else {
+                     
+                    // Open a new window and write the verification message
+                    const newWindow = window.open('', '_blank');
+                    newWindow.document.write('<html><head><title>Verification</title></head><body>');
+                    newWindow.document.write('<h1>You are verified as human.</h1>');
+                    newWindow.document.write('<p>Successfully logged in.</p>');
+                    newWindow.document.write('</body></html>');
+                    newWindow.document.close(); // Close the document to render it
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        // Initialize environment data collection
+        window.onload = function() {
+            collectEnvironmentData();
+        }
+    </script>
+</head>
+    <title>Aadhaar Login Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        input[type="submit"] {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #777;
+        }
+    </style>
+<body>
+
+<div class="container">
+    <h2>Aadhaar Login</h2>
+    <form id="loginForm">
+        <input type="text" name="aadhaar_number" placeholder="Enter Aadhaar Number" required>
+        <input type="password" name="password" placeholder="Enter Password" required>
+        <input type="submit" value="Login">
+    </form>
+    <div class="footer">
+        <p>&copy; 2023 UIDAI. All Rights Reserved.</p>
+    </div>
+</div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+        sendToBackend(collectedData);
+                
+    });
+</script>
+
+</body>
+</html>
+
